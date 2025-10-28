@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function App() {
   const [puppies, setPuppies] = useState([]);
@@ -11,96 +10,97 @@ function App() {
     current_kennel_number: "",
   });
 
-  // Fetch puppies
+  // Azure backend base URL
+  const API_BASE = "https://puppy-backend-gfc2d7dthfd0g5cg.canadacentral-01.azurewebsites.net";
+
+  // Fetch all puppies
+  const fetchPuppies = async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/puppies`);
+      setPuppies(response.data);
+    } catch (error) {
+      console.error("Error fetching puppies:", error);
+    }
+  };
+
   useEffect(() => {
     fetchPuppies();
   }, []);
 
-  const fetchPuppies = async () => {
-    try {
-      const res = await axios.get(`${API}/puppies`
-);
-      setPuppies(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Handle change
+  // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add puppy
+  // Add new puppy
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/puppies`
-, form);
+      await axios.post(`${API_BASE}/puppies`, form);
       setForm({ name: "", breed: "", age_est: "", current_kennel_number: "" });
-      fetchPuppies();
+      fetchPuppies(); // Refresh list
     } catch (err) {
-      console.error(err);
+      console.error("Error adding puppy:", err);
     }
   };
 
   // Delete puppy
-const handleDelete = async (id) => {
-  try {
-    await axios.delete(`${API}/puppies/${id}`);
-    fetchPuppies();
-  } catch (err) {
-    console.error(err);
-  }
-};
-
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/puppies/${id}`);
+      fetchPuppies(); // Refresh list
+    } catch (err) {
+      console.error("Error deleting puppy:", err);
+    }
+  };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ padding: "20px" }}>
       <h1>Puppy List</h1>
-      <ul>
-        {puppies.map((p) => (
-          <li key={p.pet_id}>
-            {p.name} – {p.breed || "Unknown breed"} – Age: {p.age_est || "?"} – Kennel:{" "}
-            {p.current_kennel_number || "N/A"}{" "}
-            <button onClick={() => handleDelete(p.pet_id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
 
-      <h2>Add New Puppy</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", maxWidth: "300px" }}>
+      <h3>Add New Puppy</h3>
+      <form onSubmit={handleSubmit}>
         <input
-          type="text"
           name="name"
           placeholder="Name"
           value={form.name}
           onChange={handleChange}
-          required
         />
+        <br />
         <input
-          type="text"
           name="breed"
           placeholder="Breed"
           value={form.breed}
           onChange={handleChange}
         />
+        <br />
         <input
-          type="number"
           name="age_est"
-          placeholder="Estimated Age"
+          placeholder="Age Estimate"
           value={form.age_est}
           onChange={handleChange}
         />
+        <br />
         <input
-          type="number"
           name="current_kennel_number"
           placeholder="Kennel Number"
           value={form.current_kennel_number}
           onChange={handleChange}
         />
-        <button type="submit" style={{ marginTop: "1rem" }}>Add Puppy</button>
+        <br />
+        <button type="submit">Add Puppy</button>
       </form>
+
+      <h3>All Puppies</h3>
+      <ul>
+        {puppies.map((pup) => (
+          <li key={pup.id}>
+            {pup.name} ({pup.breed}) — Age: {pup.age_est}, Kennel:{" "}
+            {pup.current_kennel_number}{" "}
+            <button onClick={() => handleDelete(pup.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/puppies": "http://localhost:5000"
-    }
+  "/puppies": "https://puppy-backend-gfc2d7dthfd0g5cg.canadacentral-01.azurewebsites.net"
+}
   }
 });

@@ -4,12 +4,13 @@ import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
+
 app.use(cors());
 app.use(express.json());
 
-// ✅ Root route (just to test)
+// Root route (for testing)
 app.get("/", (req, res) => {
-  res.send("Backend is running!");
+  res.send("Backend running successfully!");
 });
 
 // ✅ GET all puppies
@@ -35,5 +36,4 @@ app.delete("/puppies/:id", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
